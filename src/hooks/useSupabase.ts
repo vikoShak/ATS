@@ -3,247 +3,25 @@ import { supabase, Database } from '../lib/supabase'; // Import supabase client 
 
 type ApplicantRow = Database['public']['Tables']['applicants']['Row'];
 
-// Mock data for demo purposes
-const mockApplicants: (ApplicantRow & { applications?: any[] })[] = [
-  {
-    id: '1',
-    full_name: 'John Smith',
-    email: 'john.smith@email.com',
-    phone: '+1-555-0123',
-    location: 'New York, NY',
-    visa_status: 'USC',
-    visa_validity: '2025-12-31',
-    skills: 'JavaScript, React, Node.js',
-    comments: 'Experienced developer with strong frontend skills',
-    status: 'Applied',
-    applied_date: '2024-01-15',
-    created_at: '2024-01-15T10:00:00Z',
-    updated_at: '2024-01-15T10:00:00Z',
-    resume_url: null,
-    supporting_documents_urls: [],
-    source: 'LinkedIn',
-    taxTerm: 'Corp-to-Corp',
-    payRate: 75,
-    submissionRate: 85,
-    applications: [{
-      id: '1',
-      requirement_id: '1',
-      status: 'Applied',
-      requirements: {
-        title: 'Senior Software Engineer',
-        department_id: '1',
-        departments: { name: 'Engineering' }
-      }
-    }]
-  },
-  {
-    id: '2',
-    full_name: 'Sarah Johnson',
-    email: 'sarah.johnson@email.com',
-    phone: '+1-555-0124',
-    location: 'San Francisco, CA',
-    visa_status: 'H1B Holder',
-    visa_validity: '2025-06-30',
-    skills: 'Python, Django, PostgreSQL',
-    comments: 'Backend specialist with database expertise',
-    status: 'Screening',
-    applied_date: '2024-01-14',
-    created_at: '2024-01-14T09:30:00Z',
-    updated_at: '2024-01-14T09:30:00Z',
-    resume_url: null,
-    supporting_documents_urls: [],
-    source: 'Monster',
-    taxTerm: 'W-2',
-    payRate: 80,
-    submissionRate: 95,
-    applications: [{
-      id: '2',
-      requirement_id: '2',
-      status: 'Screening',
-      requirements: {
-        title: 'Product Manager',
-        department_id: '2',
-        departments: { name: 'Product' }
-      }
-    }]
-  },
-  {
-    id: '3',
-    full_name: 'Mike Davis',
-    email: 'mike.davis@email.com',
-    phone: '+1-555-0125',
-    location: 'Chicago, IL',
-    visa_status: 'Green Card',
-    visa_validity: null,
-    skills: 'UI/UX Design, Figma, Adobe Creative Suite',
-    comments: 'Creative designer with strong portfolio',
-    status: 'Interview',
-    applied_date: '2024-01-13',
-    created_at: '2024-01-13T14:15:00Z',
-    updated_at: '2024-01-13T14:15:00Z',
-    resume_url: null,
-    supporting_documents_urls: [],
-    source: 'Dice',
-    taxTerm: '1099',
-    payRate: 65,
-    submissionRate: 75,
-    applications: [{
-      id: '3',
-      requirement_id: '3',
-      status: 'Interview',
-      requirements: {
-        title: 'UX Designer',
-        department_id: '3',
-        departments: { name: 'Design' }
-      }
-    }]
-  },
-  {
-    id: '6',
-    cn_number: 'CN-002',
-    full_name: 'Alex Thompson',
-    email: 'alex.thompson@email.com',
-    phone: '+1-555-0128',
-    location: 'Seattle, WA',
-    visa_status: 'Green Card',
-    visa_validity: null,
-    skills: 'Java, Spring Boot, Microservices',
-    comments: 'Senior backend developer with cloud experience',
-    status: 'Joined',
-    applied_date: '2024-01-20',
-    created_at: '2024-01-20T11:00:00Z',
-    updated_at: '2024-01-20T11:00:00Z',
-    source: 'LinkedIn',
-    taxTerm: 'W-2',
-    payRate: 85,
-    submissionRate: 95,
-    resume_url: null,
-    supporting_documents_urls: [],
-    applications: [{
-      id: '6',
-      requirement_id: '1',
-      status: 'Joined',
-      requirements: {
-        title: 'Senior Backend Developer',
-        department_id: '1',
-        departments: { name: 'Engineering' }
-      }
-    }]
-  }
-];
+// Empty arrays for fresh start - all mock data removed
+const mockApplicants: (ApplicantRow & { applications?: any[] })[] = [];
 
-const mockRequirements = [
-  {
-    id: '1',
-    title: 'Senior Software Engineer',
-    requirement_number: 'REQ-001',
-    customer_name: 'Acme Corp',
-    department_id: '1',
-    location: 'San Francisco, CA',
-    type: 'Full-time',
-    status: 'Open',
-    posted_date: '2024-01-10',
-    deadline: '2024-02-10',
-    description: 'We are looking for a senior software engineer to join our team...',
-    created_at: '2024-01-10T08:00:00Z',
-    updated_at: '2024-01-10T08:00:00Z',
-    departments: { name: 'Engineering' },
-    applications: []
-  },
-  {
-    id: '2',
-    title: 'Product Manager',
-    requirement_number: 'REQ-002',
-    customer_name: 'Globex Inc.',
-    department_id: '2',
-    location: 'New York, NY',
-    type: 'Full-time',
-    status: 'Open',
-    posted_date: '2024-01-12',
-    deadline: '2024-02-15',
-    description: 'Seeking an experienced product manager to lead our product initiatives...',
-    created_at: '2024-01-12T09:00:00Z',
-    updated_at: '2024-01-12T09:00:00Z',
-    departments: { name: 'Product' },
-    applications: []
-  },
-  {
-    id: '3',
-    title: 'UX Designer',
-    requirement_number: 'REQ-003',
-    customer_name: 'Initech',
-    department_id: '3',
-    location: 'Chicago, IL',
-    type: 'Full-time',
-    status: 'Open',
-    posted_date: '2024-01-13',
-    deadline: '2024-02-20',
-    description: 'Creative designer with strong portfolio...',
-    created_at: '2024-01-13T14:15:00Z',
-    updated_at: '2024-01-13T14:15:00Z',
-    departments: { name: 'Design' },
-    applications: []
-  }
-];
+const mockRequirements = [];
 
-const mockTimesheets = [
-  {
-    id: '1',
-    employee_name: 'John Smith',
-    date: '2024-01-15',
-    hours_worked: 8.5,
-    project: 'Project Alpha',
-    status: 'Pending',
-    created_at: '2024-01-15T17:00:00Z',
-    updated_at: '2024-01-15T17:00:00Z'
-  },
-  {
-    id: '2',
-    employee_name: 'Sarah Johnson',
-    date: '2024-01-15',
-    hours_worked: 7.0,
-    project: 'Project Beta',
-    status: 'Approved',
-    created_at: '2024-01-15T17:30:00Z',
-    updated_at: '2024-01-15T17:30:00Z'
-  }
-];
+const mockTimesheets = [];
 
-const mockActivities = [
-  {
-    id: '1',
-    action: 'New application received',
-    entity_type: 'applicant',
-    entity_id: '1',
-    details: { name: 'John Smith' },
-    created_at: '2024-01-15T10:00:00Z'
-  },
-  {
-    id: '2',
-    action: 'Application status updated',
-    entity_type: 'applicant',
-    entity_id: '2',
-    details: { name: 'Sarah Johnson', status: 'Screening' },
-    created_at: '2024-01-14T15:30:00Z'
-  },
-  {
-    id: '3',
-    action: 'New job posted',
-    entity_type: 'requirement',
-    entity_id: '1',
-    details: { title: 'Senior Software Engineer' },
-    created_at: '2024-01-10T08:00:00Z'
-  }
-];
+const mockActivities = [];
 
 const mockDepartments = [
   { id: '1', name: 'Engineering', description: 'Software development and technical roles', created_at: '2024-01-01T00:00:00Z' },
   { id: '2', name: 'Product', description: 'Product management and strategy', created_at: '2024-01-01T00:00:00Z' },
   { id: '3', name: 'Design', description: 'UI/UX and graphic design', created_at: '2024-01-01T00:00:00Z' },
-  { id: '4', name: 'Marketing', description: 'Marketing and brand management', created_at: '2024-01-01T00:00:00Z' }
+  { id: '4', name: 'Marketing', description: 'Marketing and brand management', created_at: '2024-01-01T00:00:00Z' },
+  { id: '5', name: 'Sales', description: 'Sales and business development', created_at: '2024-01-01T00:00:00Z' },
+  { id: '6', name: 'Analytics', description: 'Data analysis and business intelligence', created_at: '2024-01-01T00:00:00Z' }
 ];
 
-// Custom hook for mock data operations
+// Custom hook for data operations
 export const useSupabase = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -252,8 +30,6 @@ export const useSupabase = () => {
     setLoading(true);
     setError(null);
     try {
-      // Removed setTimeout to fix TypeError: t._onTimeout is not a function
-      // await new Promise(resolve => setTimeout(resolve, 500));
       const result = await operation();
       return result;
     } catch (err) {
@@ -599,7 +375,7 @@ export const useSupabase = () => {
     // Applicants
     getApplicants,
     createApplicant,
-    bulkCreateApplicants, // New bulk upload function
+    bulkCreateApplicants,
     updateApplicant,
     deleteApplicant,
     // Requirements

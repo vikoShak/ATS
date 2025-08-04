@@ -29,34 +29,38 @@ const Reports: React.FC = () => {
     const fetchCandidates = async () => {
       const applicants = await getApplicants();
       if (applicants) {
-        // Map mock applicants to the desired structure for the table
-        const mappedApplicants: ApplicantRow[] = applicants.map(app => ({
-          id: app.id,
-          full_name: app.full_name,
-          email: app.email,
-          phone: app.phone,
-          location: app.location,
-          visa_status: app.visa_status,
-          skills: app.skills,
-          status: app.status,
-          source: app.source,
-          taxTerm: app.taxTerm,
-          payRate: app.payRate,
-          submissionRate: app.submissionRate,
-          // Simulate margin and aging days for mock data
-          margin: app.payRate && app.submissionRate ? app.submissionRate - app.payRate : 0,
-          requirement: app.applications?.[0]?.requirements?.title || 'N/A',
-          customer: app.applications?.[0]?.requirements?.customer_name || 'N/A', // Assuming customer_name might be available
-          l1_interview_date: '2024-01-15', // Mock
-          l2_interview_date: '2024-01-18', // Mock
-          l3_interview_date: '', // Mock
-          confirmed_date: '', // Mock
-          joined_date: '', // Mock
-          submitted_date: app.applied_date || 'N/A',
-          aging_days: Math.floor(Math.random() * 30) + 1, // Random aging days for demo
-          recruiter: 'Vivek Sharma' // Mock
-        }));
-        setCandidateData(mappedApplicants);
+        if (applicants.length > 0) {
+          // Map applicants to the desired structure for the table
+          const mappedApplicants: ApplicantRow[] = applicants.map(app => ({
+            id: app.id,
+            full_name: app.full_name,
+            email: app.email,
+            phone: app.phone,
+            location: app.location,
+            visa_status: app.visa_status,
+            skills: app.skills,
+            status: app.status,
+            source: app.source,
+            taxTerm: app.taxTerm,
+            payRate: app.payRate,
+            submissionRate: app.submissionRate,
+            // Simulate margin and aging days for mock data
+            margin: app.payRate && app.submissionRate ? app.submissionRate - app.payRate : 0,
+            requirement: app.applications?.[0]?.requirements?.title || 'N/A',
+            customer: app.applications?.[0]?.requirements?.customer_name || 'N/A',
+            l1_interview_date: '2024-01-15', // Mock
+            l2_interview_date: '2024-01-18', // Mock
+            l3_interview_date: '', // Mock
+            confirmed_date: '', // Mock
+            joined_date: '', // Mock
+            submitted_date: app.applied_date || 'N/A',
+            aging_days: Math.floor(Math.random() * 30) + 1, // Random aging days for demo
+            recruiter: 'Vivek Sharma' // Mock
+          }));
+          setCandidateData(mappedApplicants);
+        } else {
+          setCandidateData([]);
+        }
       }
     };
     fetchCandidates();
@@ -79,13 +83,13 @@ const Reports: React.FC = () => {
   ];
 
   // Source distribution data (mock, could be derived from candidateData)
-  const sourceDistribution = [
-    { source: 'LinkedIn', count: 45, percentage: 35 },
-    { source: 'Monster', count: 32, percentage: 25 },
-    { source: 'Dice', count: 26, percentage: 20 },
-    { source: 'Tech Fetch', count: 19, percentage: 15 },
-    { source: 'Social Media', count: 6, percentage: 5 }
-  ];
+  const sourceDistribution = candidateData.length > 0 ? [
+    { source: 'LinkedIn', count: candidateData.filter(c => c.source === 'LinkedIn').length, percentage: Math.round((candidateData.filter(c => c.source === 'LinkedIn').length / candidateData.length) * 100) },
+    { source: 'Monster', count: candidateData.filter(c => c.source === 'Monster').length, percentage: Math.round((candidateData.filter(c => c.source === 'Monster').length / candidateData.length) * 100) },
+    { source: 'Dice', count: candidateData.filter(c => c.source === 'Dice').length, percentage: Math.round((candidateData.filter(c => c.source === 'Dice').length / candidateData.length) * 100) },
+    { source: 'Tech Fetch', count: candidateData.filter(c => c.source === 'Tech Fetch').length, percentage: Math.round((candidateData.filter(c => c.source === 'Tech Fetch').length / candidateData.length) * 100) },
+    { source: 'Bulk Upload', count: candidateData.filter(c => c.source === 'Bulk Upload').length, percentage: Math.round((candidateData.filter(c => c.source === 'Bulk Upload').length / candidateData.length) * 100) }
+  ].filter(item => item.count > 0) : [];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -404,161 +408,186 @@ const Reports: React.FC = () => {
         {/* Source Distribution */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Source Distribution</h2>
-          <div className="space-y-4">
-            {sourceDistribution.map((source) => (
-              <div key={source.source} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-700">{source.source}</span>
-                  <span className="text-sm text-gray-600">{source.count} ({source.percentage}%)</span>
+          {sourceDistribution.length > 0 ? (
+            <div className="space-y-4">
+              {sourceDistribution.map((source) => (
+                <div key={source.source} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">{source.source}</span>
+                    <span className="text-sm text-gray-600">{source.count} ({source.percentage}%)</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${source.percentage}%` }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${source.percentage}%` }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500">No source data available</p>
+              <p className="text-sm text-gray-400 mt-2">Add candidates to see source distribution</p>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Full Candidate Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">All Submitted Candidates</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Candidate
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Contact & Location
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Interview Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Rates & Terms
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Requirement
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Aging
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {candidateData.map((candidate) => (
-                <tr key={candidate.id} className="hover:bg-gray-50 transition-colors duration-200">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
-                          <span className="text-white font-medium text-sm">
-                            {candidate.full_name.split(' ').map(n => n[0]).join('')}
-                          </span>
+        {candidateData.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Candidate
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Contact & Location
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Interview Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Rates & Terms
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Requirement
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Aging
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {candidateData.map((candidate) => (
+                  <tr key={candidate.id} className="hover:bg-gray-50 transition-colors duration-200">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+                            <span className="text-white font-medium text-sm">
+                              {candidate.full_name.split(' ').map(n => n[0]).join('')}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">{candidate.full_name}</div>
+                          <div className="text-sm text-gray-500">{candidate.visa_status}</div>
                         </div>
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{candidate.full_name}</div>
-                        <div className="text-sm text-gray-500">{candidate.visa_status}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="space-y-1">
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Mail className="w-3 h-3 mr-1" />
+                          {candidate.email}
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Phone className="w-3 h-3 mr-1" />
+                          {candidate.phone}
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <MapPin className="w-3 h-3 mr-1" />
+                          {candidate.location}
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="space-y-1">
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Mail className="w-3 h-3 mr-1" />
-                        {candidate.email}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="space-y-1">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(candidate.status)}`}>
+                          {candidate.status}
+                        </span>
+                        <div className="text-xs text-gray-500">
+                          {candidate.l1_interview_date && <div>L1: {new Date(candidate.l1_interview_date).toLocaleDateString()}</div>}
+                          {candidate.l2_interview_date && <div>L2: {new Date(candidate.l2_interview_date).toLocaleDateString()}</div>}
+                          {candidate.l3_interview_date && <div>L3: {new Date(candidate.l3_interview_date).toLocaleDateString()}</div>}
+                          {candidate.confirmed_date && <div>Confirmed: {new Date(candidate.confirmed_date).toLocaleDateString()}</div>}
+                          {candidate.joined_date && <div>Joined: {new Date(candidate.joined_date).toLocaleDateString()}</div>}
+                        </div>
                       </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Phone className="w-3 h-3 mr-1" />
-                        {candidate.phone}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="space-y-1">
+                        <div className="text-sm text-gray-900">Pay: ${candidate.payRate}/hr</div>
+                        <div className="text-sm text-gray-600">Sub: ${candidate.submissionRate}/hr</div>
+                        <div className="text-sm font-medium text-green-600">Margin: ${candidate.margin}/hr</div>
+                        <div className="text-xs text-gray-500">{candidate.taxTerm}</div>
                       </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <MapPin className="w-3 h-3 mr-1" />
-                        {candidate.location}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="space-y-1">
+                        <div className="text-sm font-medium text-gray-900">{candidate.requirement}</div>
+                        <div className="text-sm text-gray-600">{candidate.customer}</div>
+                        <div className="text-xs text-gray-500">Source: {candidate.source}</div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="space-y-1">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(candidate.status)}`}>
-                        {candidate.status}
-                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Clock className="w-4 h-4 mr-1 text-gray-400" />
+                        <span className={`text-sm font-medium ${getAgingColor(candidate.aging_days || 0)}`}>
+                          {candidate.aging_days} days
+                        </span>
+                      </div>
                       <div className="text-xs text-gray-500">
-                        {candidate.l1_interview_date && <div>L1: {new Date(candidate.l1_interview_date).toLocaleDateString()}</div>}
-                        {candidate.l2_interview_date && <div>L2: {new Date(candidate.l2_interview_date).toLocaleDateString()}</div>}
-                        {candidate.l3_interview_date && <div>L3: {new Date(candidate.l3_interview_date).toLocaleDateString()}</div>}
-                        {candidate.confirmed_date && <div>Confirmed: {new Date(candidate.confirmed_date).toLocaleDateString()}</div>}
-                        {candidate.joined_date && <div>Joined: {new Date(candidate.joined_date).toLocaleDateString()}</div>}
+                        Recruiter: {candidate.recruiter}
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="space-y-1">
-                      <div className="text-sm text-gray-900">Pay: ${candidate.payRate}/hr</div>
-                      <div className="text-sm text-gray-600">Sub: ${candidate.submissionRate}/hr</div>
-                      <div className="text-sm font-medium text-green-600">Margin: ${candidate.margin}/hr</div>
-                      <div className="text-xs text-gray-500">{candidate.taxTerm}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="space-y-1">
-                      <div className="text-sm font-medium text-gray-900">{candidate.requirement}</div>
-                      <div className="text-sm text-gray-600">{candidate.customer}</div>
-                      <div className="text-xs text-gray-500">Source: {candidate.source}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <Clock className="w-4 h-4 mr-1 text-gray-400" />
-                      <span className={`text-sm font-medium ${getAgingColor(candidate.aging_days || 0)}`}>
-                        {candidate.aging_days} days
-                      </span>
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      Recruiter: {candidate.recruiter}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleViewCandidate(candidate)}
-                        className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors duration-200"
-                        title="View Candidate Details"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleEditCandidate(candidate)}
-                        className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50 transition-colors duration-200"
-                        title="Edit Candidate"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      {(candidate.aging_days || 0) > 7 && (
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex items-center space-x-2">
                         <button
-                          onClick={() => handleSendAlert(candidate)}
-                          className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors duration-200"
-                          title="Send Aging Alert Email"
+                          onClick={() => handleViewCandidate(candidate)}
+                          className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors duration-200"
+                          title="View Candidate Details"
                         >
-                          <Mail className="w-4 h-4" />
+                          <Eye className="w-4 h-4" />
                         </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                        <button
+                          onClick={() => handleEditCandidate(candidate)}
+                          className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50 transition-colors duration-200"
+                          title="Edit Candidate"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        {(candidate.aging_days || 0) > 7 && (
+                          <button
+                            onClick={() => handleSendAlert(candidate)}
+                            className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors duration-200"
+                            title="Send Aging Alert Email"
+                          >
+                            <Mail className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <div className="text-gray-400 mb-4">
+              <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No Candidates Yet</h3>
+            <p className="text-gray-500 mb-4">Start by adding candidates to your ATS system</p>
+            <button
+              onClick={() => window.location.href = '/applicants/add'}
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Add First Candidate
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

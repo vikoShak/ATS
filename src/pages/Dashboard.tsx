@@ -66,6 +66,9 @@ const Dashboard: React.FC = () => {
   const recentRequirements = requirements.slice(0, 5).sort((a, b) => new Date(b.postedDate).getTime() - new Date(a.postedDate).getTime());
   const recentTimesheets = timesheets.slice(0, 5).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
+  // Check if system is empty (fresh start)
+  const isSystemEmpty = totalApplicants === 0 && totalRequirements === 0 && totalTimesheets === 0;
+
   if (loading) {
     return (
       <div className="p-8 min-h-screen bg-[#171717] flex items-center justify-center">
@@ -139,14 +142,21 @@ const Dashboard: React.FC = () => {
             {/* Applicants Overview */}
             <div className="bg-[#1F1F1F] p-8 rounded-2xl shadow-lg border border-[#2F2F2F]">
               <h2 className="text-3xl font-bold text-[#38bdf8] mb-6">Applicants Overview</h2>
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                {Object.entries(applicantsByStatus).map(([status, count]) => (
-                  <div key={status} className="flex items-center space-x-3">
-                    <span className={`w-3 h-3 rounded-full ${getStatusColor(status)}`}></span>
-                    <p className="text-lg text-[#FFFFFF]">{status}: <span className="font-semibold">{count}</span></p>
-                  </div>
-                ))}
-              </div>
+              {totalApplicants > 0 ? (
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  {Object.entries(applicantsByStatus).map(([status, count]) => (
+                    <div key={status} className="flex items-center space-x-3">
+                      <span className={`w-3 h-3 rounded-full ${getStatusColor(status)}`}></span>
+                      <p className="text-lg text-[#FFFFFF]">{status}: <span className="font-semibold">{count}</span></p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-[#A3A3A3] text-lg">No applicants yet</p>
+                  <p className="text-[#A3A3A3] text-sm mt-2">Start by adding your first applicant</p>
+                </div>
+              )}
               <h3 className="text-xl font-semibold text-[#A3A3A3] mb-4">Recent Applicants</h3>
               {recentApplicants.length > 0 ? (
                 <ul className="space-y-3">
@@ -160,21 +170,28 @@ const Dashboard: React.FC = () => {
                   ))}
                 </ul>
               ) : (
-                <p className="text-[#A3A3A3]">No recent applicants.</p>
+                <p className="text-[#A3A3A3]">No applicants added yet.</p>
               )}
             </div>
 
             {/* Requirements Overview */}
             <div className="bg-[#1F1F1F] p-8 rounded-2xl shadow-lg border border-[#2F2F2F]">
               <h2 className="text-3xl font-bold text-[#f472b6] mb-6">Requirements Overview</h2>
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                {Object.entries(requirementsByType).map(([type, count]) => (
-                  <div key={type} className="flex items-center space-x-3">
-                    <span className="w-3 h-3 rounded-full bg-gray-400"></span>
-                    <p className="text-lg text-[#FFFFFF]">{type}: <span className="font-semibold">{count}</span></p>
-                  </div>
-                ))}
-              </div>
+              {totalRequirements > 0 ? (
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  {Object.entries(requirementsByType).map(([type, count]) => (
+                    <div key={type} className="flex items-center space-x-3">
+                      <span className="w-3 h-3 rounded-full bg-gray-400"></span>
+                      <p className="text-lg text-[#FFFFFF]">{type}: <span className="font-semibold">{count}</span></p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-[#A3A3A3] text-lg">No job requirements yet</p>
+                  <p className="text-[#A3A3A3] text-sm mt-2">Start by posting your first job</p>
+                </div>
+              )}
               <h3 className="text-xl font-semibold text-[#A3A3A3] mb-4">Recent Requirements</h3>
               {recentRequirements.length > 0 ? (
                 <ul className="space-y-3">
@@ -188,27 +205,34 @@ const Dashboard: React.FC = () => {
                   ))}
                 </ul>
               ) : (
-                <p className="text-[#A3A3A3]">No recent requirements.</p>
+                <p className="text-[#A3A3A3]">No job requirements posted yet.</p>
               )}
             </div>
 
             {/* Timesheets Overview */}
             <div className="bg-[#1F1F1F] p-8 rounded-2xl shadow-lg border border-[#2F2F2F]">
               <h2 className="text-3xl font-bold text-[#10b981] mb-6">Timesheets Overview</h2>
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="flex items-center space-x-3">
-                  <span className={`w-3 h-3 rounded-full ${getStatusColor('Pending')}`}></span>
-                  <p className="text-lg text-[#FFFFFF]">Pending: <span className="font-semibold">{pendingTimesheets}</span></p>
+              {totalTimesheets > 0 ? (
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="flex items-center space-x-3">
+                    <span className={`w-3 h-3 rounded-full ${getStatusColor('Pending')}`}></span>
+                    <p className="text-lg text-[#FFFFFF]">Pending: <span className="font-semibold">{pendingTimesheets}</span></p>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <span className={`w-3 h-3 rounded-full ${getStatusColor('Approved')}`}></span>
+                    <p className="text-lg text-[#FFFFFF]">Approved: <span className="font-semibold">{approvedTimesheets}</span></p>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <span className={`w-3 h-3 rounded-full ${getStatusColor('Rejected')}`}></span>
+                    <p className="text-lg text-[#FFFFFF]">Rejected: <span className="font-semibold">{rejectedTimesheets}</span></p>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <span className={`w-3 h-3 rounded-full ${getStatusColor('Approved')}`}></span>
-                  <p className="text-lg text-[#FFFFFF]">Approved: <span className="font-semibold">{approvedTimesheets}</span></p>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-[#A3A3A3] text-lg">No timesheets yet</p>
+                  <p className="text-[#A3A3A3] text-sm mt-2">Timesheets will appear when candidates join projects</p>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <span className={`w-3 h-3 rounded-full ${getStatusColor('Rejected')}`}></span>
-                  <p className="text-lg text-[#FFFFFF]">Rejected: <span className="font-semibold">{rejectedTimesheets}</span></p>
-                </div>
-              </div>
+              )}
               <h3 className="text-xl font-semibold text-[#A3A3A3] mb-4">Recent Timesheets</h3>
               {recentTimesheets.length > 0 ? (
                 <ul className="space-y-3">
@@ -222,7 +246,7 @@ const Dashboard: React.FC = () => {
                   ))}
                 </ul>
               ) : (
-                <p className="text-[#A3A3A3]">No recent timesheets.</p>
+                <p className="text-[#A3A3A3]">No timesheets submitted yet.</p>
               )}
             </div>
 
@@ -250,10 +274,37 @@ const Dashboard: React.FC = () => {
                   ))}
                 </ul>
               ) : (
-                <p className="text-[#A3A3A3]">No recent activities.</p>
+                <div className="text-center py-8">
+                  <p className="text-[#A3A3A3] text-lg">No activities yet</p>
+                  <p className="text-[#A3A3A3] text-sm mt-2">System activities will appear here as you use the ATS</p>
+                </div>
               )}
             </div>
           </div>
+
+          {/* Fresh Start Welcome Message */}
+          {isSystemEmpty && (
+            <div className="bg-[#1F1F1F] p-8 rounded-2xl shadow-lg border border-[#2F2F2F] text-center">
+              <h2 className="text-3xl font-bold text-[#9E7FFF] mb-4">Welcome to Your Fresh ATS System!</h2>
+              <p className="text-lg text-[#A3A3A3] mb-6">
+                Your system is ready for fresh data. Start by:
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-[#262626] p-6 rounded-lg border border-[#2F2F2F]">
+                  <h3 className="text-xl font-semibold text-[#38bdf8] mb-2">1. Post Jobs</h3>
+                  <p className="text-[#A3A3A3] text-sm">Create job requirements and openings</p>
+                </div>
+                <div className="bg-[#262626] p-6 rounded-lg border border-[#2F2F2F]">
+                  <h3 className="text-xl font-semibold text-[#f472b6] mb-2">2. Add Applicants</h3>
+                  <p className="text-[#A3A3A3] text-sm">Start adding candidates to your pipeline</p>
+                </div>
+                <div className="bg-[#262626] p-6 rounded-lg border border-[#2F2F2F]">
+                  <h3 className="text-xl font-semibold text-[#10b981] mb-2">3. Track Progress</h3>
+                  <p className="text-[#A3A3A3] text-sm">Monitor interviews and manage timesheets</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
