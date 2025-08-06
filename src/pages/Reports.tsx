@@ -23,11 +23,11 @@ const Reports: React.FC = () => {
   const [bulkUploadFiles, setBulkUploadFiles] = useState<FileList | null>(null);
   const [uploadedApplicants, setUploadedApplicants] = useState<ApplicantRow[]>([]);
   const [candidateData, setCandidateData] = useState<ApplicantRow[]>([]); // Use state for candidateData
-  const { getApplicants, bulkCreateApplicants, loading, error } = useSupabase();
+  const { getAllApplicants, bulkCreateApplicants, loading, error } = useSupabase();
 
   useEffect(() => {
     const fetchCandidates = async () => {
-      const applicants = await getApplicants();
+      const applicants = await getAllApplicants();
       if (applicants) {
         if (applicants.length > 0) {
           // Map applicants to the desired structure for the table
@@ -75,12 +75,7 @@ const Reports: React.FC = () => {
   ];
 
   // Interview lineup data (mock, could be derived from candidateData)
-  const interviewLineup = [
-    { customer: 'TechCorp Inc', requirement: 'REQ-2024-001', interviews: 3, upcoming: 2 },
-    { customer: 'DataCorp', requirement: 'REQ-2024-002', interviews: 2, upcoming: 1 },
-    { customer: 'DesignStudio Pro', requirement: 'REQ-2024-003', interviews: 1, upcoming: 0 },
-    { customer: 'Analytics Inc', requirement: 'REQ-2024-004', interviews: 1, upcoming: 1 }
-  ];
+  const interviewLineup: any[] = []; // Empty array to clear interview data
 
   // Source distribution data (mock, could be derived from candidateData)
   const sourceDistribution = candidateData.length > 0 ? [
@@ -385,23 +380,9 @@ const Reports: React.FC = () => {
         {/* Interviews Lined Up */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Interviews Lined Up</h2>
-          <div className="space-y-4">
-            {interviewLineup.map((item, index) => (
-              <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <div className="font-medium text-gray-900">{item.customer}</div>
-                  <div className="text-sm text-gray-600">{item.requirement}</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-lg font-semibold text-blue-600">{item.interviews}</div>
-                  <div className="text-xs text-gray-500">Total</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-lg font-semibold text-green-600">{item.upcoming}</div>
-                  <div className="text-xs text-gray-500">Upcoming</div>
-                </div>
-              </div>
-            ))}
+          <div className="text-center py-8">
+            <p className="text-gray-500">No interviews scheduled</p>
+            <p className="text-sm text-gray-400 mt-2">Interview data will appear here when candidates are scheduled</p>
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Mail, Phone, MapPin, FileText, Calendar, Code, MessageSquare } from 'lucide-react';
+import { X, User, Mail, Phone, MapPin, FileText, Calendar, Code, MessageSquare, DollarSign } from 'lucide-react';
 
 interface ApplicantModalProps {
   applicant: any;
@@ -102,6 +102,68 @@ const ApplicantModal: React.FC<ApplicantModalProps> = ({
 
         {/* Content */}
         <div className="p-6 space-y-6">
+          {/* Resume Section */}
+          {applicant.resume_url && (
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                <FileText className="w-5 h-5 mr-2 text-orange-600" />
+                Resume
+              </h3>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <FileText className="w-8 h-8 text-blue-600 mr-3" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">Resume Document</p>
+                      <p className="text-xs text-gray-500">Click to view or download</p>
+                    </div>
+                  </div>
+                  <a
+                    href={applicant.resume_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
+                  >
+                    View Resume
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Supporting Documents Section */}
+          {applicant.supporting_documents_urls && applicant.supporting_documents_urls.length > 0 && (
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                <FileText className="w-5 h-5 mr-2 text-orange-600" />
+                Supporting Documents
+              </h3>
+              <div className="space-y-2">
+                {applicant.supporting_documents_urls.map((url, index) => (
+                  <div key={index} className="bg-gray-50 rounded-lg p-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <FileText className="w-6 h-6 text-green-600 mr-2" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">Document {index + 1}</p>
+                          <p className="text-xs text-gray-500">Supporting document</p>
+                        </div>
+                      </div>
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors"
+                      >
+                        View
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Personal Information */}
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
@@ -123,6 +185,12 @@ const ApplicantModal: React.FC<ApplicantModalProps> = ({
                   <p className="text-gray-900">{applicant.full_name}</p>
                 )}
               </div>
+              {applicant.cn_number && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">CN Number</label>
+                  <p className="text-gray-900">{applicant.cn_number}</p>
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 {isEditing ? (
@@ -165,6 +233,40 @@ const ApplicantModal: React.FC<ApplicantModalProps> = ({
                   <p className="text-gray-900">{applicant.location}</p>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* Source and Financial Information */}
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+              <DollarSign className="w-5 h-5 mr-2 text-orange-600" />
+              Source & Financial Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {applicant.source && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Source</label>
+                  <p className="text-gray-900">{applicant.source}</p>
+                </div>
+              )}
+              {applicant.taxTerm && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tax Term</label>
+                  <p className="text-gray-900">{applicant.taxTerm}</p>
+                </div>
+              )}
+              {applicant.payRate && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Pay Rate</label>
+                  <p className="text-gray-900">${applicant.payRate}/hr</p>
+                </div>
+              )}
+              {applicant.submissionRate && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Submission Rate</label>
+                  <p className="text-gray-900">${applicant.submissionRate}/hr</p>
+                </div>
+              )}
             </div>
           </div>
 

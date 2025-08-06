@@ -70,6 +70,12 @@ export const useSupabase = () => {
 
   // Applicants operations
   const getApplicants = () => handleAsync(async () => {
+    // Only return manually added applicants (exclude bulk uploads)
+    return mockApplicants.filter(applicant => applicant.source !== 'Bulk Upload');
+  });
+
+  // Get all applicants including bulk uploads (for reports page)
+  const getAllApplicants = () => handleAsync(async () => {
     return [...mockApplicants];
   });
 
@@ -254,7 +260,7 @@ export const useSupabase = () => {
 
   // Requirements operations
   const getRequirements = () => handleAsync(async () => {
-    return [...mockRequirements];
+    return []; // Return empty array to clear all requirement data
   });
 
   const createRequirement = (requirementData: any) => handleAsync(async () => {
@@ -336,7 +342,7 @@ export const useSupabase = () => {
 
   // Timesheets operations
   const getTimesheets = () => handleAsync(async () => {
-    return [...mockTimesheets];
+    return []; // Return empty array to clear all timesheet data
   });
 
   const updateTimesheetStatus = (id: string, status: string) => handleAsync(async () => {
@@ -374,6 +380,7 @@ export const useSupabase = () => {
     error,
     // Applicants
     getApplicants,
+    getAllApplicants,
     createApplicant,
     bulkCreateApplicants,
     updateApplicant,
