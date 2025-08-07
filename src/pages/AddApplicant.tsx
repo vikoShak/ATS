@@ -113,9 +113,10 @@ const AddApplicant: React.FC = () => {
     if (!formData.visaStatus) newErrors.visaStatus = 'Visa status is required';
     
     // Ensure at least one requirement is tagged
-    if (selectedRequirements.length === 0) {
-      newErrors.requirementName = 'At least one requirement must be tagged.';
-    }
+    // Requirements validation disabled
+    // if (selectedRequirements.length === 0) {
+    //   newErrors.requirementName = 'At least one requirement must be tagged.';
+    // }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -603,14 +604,16 @@ const AddApplicant: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowTagRequirements(!showTagRequirements)}
-                className="flex items-center space-x-2 px-4 py-2 border border-orange-300 text-orange-700 rounded-lg hover:bg-orange-50 transition-colors"
+                className="flex items-center space-x-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors opacity-50 cursor-not-allowed"
+                disabled
               >
                 <Plus className="w-4 h-4" />
-                <span>Tag Requirements</span>
+                <span>Tag Requirements (Disabled)</span>
               </button>
+              <p className="text-sm text-gray-500 mt-2">Requirements functionality is currently disabled</p>
 
               {/* Requirements Selection Modal */}
-              {showTagRequirements && (
+              {false && showTagRequirements && (
                 <div className="mt-4 border border-gray-200 rounded-lg p-4 bg-gray-50">
                   <div className="mb-3">
                     <div className="relative">
@@ -694,21 +697,12 @@ const AddApplicant: React.FC = () => {
                     name="requirementName"
                     value={formData.requirementName}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                      errors.requirementName ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
+                    disabled
                   >
-                    <option value="">Select primary requirement</option>
-                    {requirements.map(req => (
-                      <option key={req.id} value={req.title}>
-                        {req.title} - {req.customer_name || req.departments?.name || 'General'}
-                      </option>
-                    ))}
+                    <option value="">Requirements functionality disabled</option>
                   </select>
-                  {errors.requirementName && <p className="text-red-500 text-sm mt-1">{errors.requirementName}</p>}
-                  {requirements.length === 0 && (
-                    <p className="text-gray-500 text-sm mt-1">No open requirements available</p>
-                  )}
+                  <p className="text-gray-500 text-sm mt-1">Requirements functionality is currently disabled</p>
                 </div>
 
                 <div className="md:col-span-2">

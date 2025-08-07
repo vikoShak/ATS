@@ -54,7 +54,12 @@ function App() {
             element={
               <ProtectedRoute>
                 <Layout>
-                  <Requirements />
+                  <div className="flex items-center justify-center min-h-96">
+                    <div className="text-center">
+                      <h2 className="text-2xl font-bold text-gray-900 mb-4">Requirements Module Disabled</h2>
+                      <p className="text-gray-600">This functionality is currently not available.</p>
+                    </div>
+                  </div>
                 </Layout>
               </ProtectedRoute>
             }
@@ -64,7 +69,12 @@ function App() {
             element={
               <ProtectedRoute>
                 <Layout>
-                  <PostJob />
+                  <div className="flex items-center justify-center min-h-96">
+                    <div className="text-center">
+                      <h2 className="text-2xl font-bold text-gray-900 mb-4">Post Job Module Disabled</h2>
+                      <p className="text-gray-600">This functionality is currently not available.</p>
+                    </div>
+                  </div>
                 </Layout>
               </ProtectedRoute>
             }
@@ -83,9 +93,12 @@ function App() {
             path="/timesheets"
             element={
               <ProtectedRoute>
-                <Layout>
-                  <Timesheets />
-                </Layout>
+                <div className="flex items-center justify-center min-h-screen">
+                  <div className="text-center">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Timesheets Module Disabled</h2>
+                    <p className="text-gray-600">This functionality is currently not available.</p>
+                  </div>
+                </div>
               </ProtectedRoute>
             }
           />
@@ -93,7 +106,12 @@ function App() {
             path="/timesheets/candidate/:candidateId"
             element={
               <ProtectedRoute>
-                <CandidateTimesheet />
+                <div className="flex items-center justify-center min-h-screen">
+                  <div className="text-center">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Candidate Timesheet Module Disabled</h2>
+                    <p className="text-gray-600">This functionality is currently not available.</p>
+                  </div>
+                </div>
               </ProtectedRoute>
             }
           />

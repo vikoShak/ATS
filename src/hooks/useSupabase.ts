@@ -186,9 +186,14 @@ export const useSupabase = () => {
     setLoading(true);
     setError(null);
     const createdApplicants: (ApplicantRow & { applications?: any[] })[] = [];
+    const updatedApplicants: (ApplicantRow & { applications?: any[] })[] = [];
     try {
       for (const file of resumeFiles) {
         const { full_name, email, phone } = _simulateResumeParsing(file);
+        
+        // Check for existing applicant with same email
+        const existingApplicantIndex = mockApplicants.findIndex(app => app.email === email);
+        
         const applicantData = {
           full_name,
           email,
@@ -204,12 +209,25 @@ export const useSupabase = () => {
           payRate: 0,
           submissionRate: 0,
         };
-        const newApplicant = await createApplicant(applicantData, file, [], []); // No supporting docs or tagged requirements for bulk
-        if (newApplicant) {
-          createdApplicants.push(newApplicant);
+        
+        if (existingApplicantIndex !== -1) {
+          // Replace existing applicant
+          const updatedApplicant = await updateApplicant(mockApplicants[existingApplicantIndex].id, {
+            ...applicantData,
+            comments: `Bulk uploaded resume (replaced): ${file.name}`,
+          });
+          if (updatedApplicant) {
+            updatedApplicants.push(updatedApplicant);
+          }
+        } else {
+          // Create new applicant
+          const newApplicant = await createApplicant(applicantData, file, [], []); // No supporting docs or tagged requirements for bulk
+          if (newApplicant) {
+            createdApplicants.push(newApplicant);
+          }
         }
       }
-      return createdApplicants;
+      return [...createdApplicants, ...updatedApplicants];
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during bulk upload');
       return null;
@@ -260,72 +278,22 @@ export const useSupabase = () => {
 
   // Requirements operations
   const getRequirements = () => handleAsync(async () => {
-    return []; // Return empty array to clear all requirement data
+    return []; // No requirements data
   });
 
   const createRequirement = (requirementData: any) => handleAsync(async () => {
-    const newRequirement = {
-      id: Date.now().toString(),
-      ...requirementData,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      departments: { name: requirementData.department || 'General' },
-      applications: []
-    };
-    
-    mockRequirements.push(newRequirement);
-    
-    // Add to activities
-    mockActivities.unshift({
-      id: Date.now().toString(),
-      action: 'New job posted',
-      entity_type: 'requirement',
-      entity_id: newRequirement.id,
-      details: { title: newRequirement.title },
-      created_at: new Date().toISOString()
-    });
-    
-    return newRequirement;
+    // Requirements functionality disabled
+    throw new Error('Requirements functionality is not available');
   });
 
   const updateRequirement = (id: string, updates: any) => handleAsync(async () => {
-    const index = mockRequirements.findIndex(r => r.id === id);
-    if (index !== -1) {
-      mockRequirements[index] = { ...mockRequirements[index], ...updates, updated_at: new Date().toISOString() };
-      
-      // Add to activities
-      mockActivities.unshift({
-        id: Date.now().toString(),
-        action: 'Job requirement updated',
-        entity_type: 'requirement',
-        entity_id: id,
-        details: { updates },
-        created_at: new Date().toISOString()
-      });
-      
-      return mockRequirements[index];
-    }
-    throw new Error('Requirement not found');
+    // Requirements functionality disabled
+    throw new Error('Requirements functionality is not available');
   });
 
   const deleteRequirement = (id: string) => handleAsync(async () => {
-    const index = mockRequirements.findIndex(r => r.id === id);
-    if (index !== -1) {
-      mockRequirements.splice(index, 1);
-      
-      // Add to activities
-      mockActivities.unshift({
-        id: Date.now().toString(),
-        action: 'Job requirement deleted',
-        entity_type: 'requirement',
-        entity_id: id,
-        details: {},
-        created_at: new Date().toISOString()
-      });
-      
-      return true;
-    }
-    throw new Error('Requirement not found');
+    // Requirements functionality disabled
+    throw new Error('Requirements functionality is not available');
   });
 
   // Applications operations
@@ -342,27 +310,12 @@ export const useSupabase = () => {
 
   // Timesheets operations
   const getTimesheets = () => handleAsync(async () => {
-    return []; // Return empty array to clear all timesheet data
+    return []; // No timesheet data
   });
 
   const updateTimesheetStatus = (id: string, status: string) => handleAsync(async () => {
-    const index = mockTimesheets.findIndex(t => t.id === id);
-    if (index !== -1) {
-      mockTimesheets[index] = { ...mockTimesheets[index], status, updated_at: new Date().toISOString() };
-      
-      // Add to activities
-      mockActivities.unshift({
-        id: Date.now().toString(),
-        action: `Timesheet ${status.toLowerCase()}`,
-        entity_type: 'timesheet',
-        entity_id: id,
-        details: { status },
-        created_at: new Date().toISOString()
-      });
-      
-      return mockTimesheets[index];
-    }
-    throw new Error('Timesheet not found');
+    // Timesheet functionality disabled
+    throw new Error('Timesheet functionality is not available');
   });
 
   // Activities operations
