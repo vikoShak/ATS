@@ -1,75 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter, Plus, Eye, Edit, CheckCircle, XCircle, Clock, Calendar, User, Building, Mail, Phone, MapPin, ArrowRight } from 'lucide-react';
-// import { useSupabase } from '../hooks/useSupabase'; // Not directly used for this mock data structure
+import { useSupabase } from '../hooks/useSupabase';
 
 const Timesheets: React.FC = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
-  // const { updateTimesheetStatus, loading, error } = useSupabase(); // For real Supabase integration
-
-  // Mock joined candidates with timesheet data
-  const initialJoinedCandidates = [
-    {
-      id: '1',
-      full_name: 'Mike Davis',
-      email: 'mike.davis@email.com',
-      phone: '+1-555-0125',
-      location: 'Chicago, IL',
-      requirement: 'UX Designer',
-      customer: 'DesignStudio Pro',
-      joined_date: '2024-01-25',
-      project_start_date: '2024-01-25',
-      project_duration: 12, // months
-      project_end_date: '2025-01-25',
-      pay_rate: 65,
-      monthly_timesheets: {
-        '2024-01': { hours: 160, status: 'Approved' },
-        '2024-02': { hours: 152, status: 'Pending' },
-        '2024-03': { hours: 0, status: 'Not Started' }
-      },
-      vendor: {
-        name: 'TechStaff Solutions',
-        email: 'vendor@techstaff.com',
-        address: '123 Business Ave, Chicago, IL 60601',
-        phone: '+1-555-0200',
-        location: 'Chicago, IL',
-        signing_authority: 'John Manager',
-        alt_number: '+1-555-0201'
-      }
-    },
-    {
-      id: '2',
-      full_name: 'Lisa Garcia',
-      email: 'lisa.garcia@email.com',
-      phone: '+1-555-0127',
-      location: 'Austin, TX',
-      requirement: 'Frontend Developer',
-      customer: 'WebTech Corp',
-      joined_date: '2024-02-01',
-      project_start_date: '2024-02-01',
-      project_duration: 6, // months
-      project_end_date: '2024-08-01',
-      pay_rate: 70,
-      monthly_timesheets: {
-        '2024-02': { hours: 120, status: 'Approved' },
-        '2024-03': { hours: 160, status: 'Pending' },
-        '2024-04': { hours: 0, status: 'Not Started' }
-      },
-      vendor: {
-        name: 'Global IT Services',
-        email: 'contact@globalit.com',
-        address: '456 Tech Plaza, Austin, TX 78701',
-        phone: '+1-555-0300',
-        location: 'Austin, TX',
-        signing_authority: 'Sarah Director',
-        alt_number: '+1-555-0301'
-      }
-    }
-  ];
-
-  const [joinedCandidates, setJoinedCandidates] = useState(initialJoinedCandidates);
 
   const getStatusColor = (status: string) => {
     switch (status) {

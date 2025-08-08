@@ -310,12 +310,110 @@ export const useSupabase = () => {
 
   // Timesheets operations
   const getTimesheets = () => handleAsync(async () => {
-    return []; // No timesheet data
+    // Get all applicants with status "Joined"
+    const joinedApplicants = mockApplicants.filter(applicant => applicant.status === 'Joined');
+    
+    // Transform joined applicants into timesheet format
+    const timesheets = joinedApplicants.map(applicant => ({
+      id: applicant.id,
+      employee_name: applicant.full_name,
+      applicant_id: applicant.id,
+      // Generate mock vendor data if not exists
+      vendor: applicant.vendor || {
+        name: `${applicant.full_name} Consulting LLC`,
+        email: applicant.email,
+        phone: applicant.phone,
+        address: `123 Business St, ${applicant.location}`,
+        location: applicant.location,
+        signing_authority: applicant.full_name,
+        alt_number: applicant.phone
+      },
+      requirement: 'Software Developer', // Mock requirement
+      customer: 'TechCorp Inc', // Mock customer
+      joined_date: new Date().toISOString().split('T')[0],
+      project_start_date: new Date().toISOString().split('T')[0],
+      project_duration: 12, // months
+      project_end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      pay_rate: applicant.payRate || 65,
+      submission_rate: applicant.submissionRate || 75,
+      // Initialize monthly timesheets for current year
+      monthly_timesheets: generateMonthlyTimesheets()
+    }));
+    
+    return timesheets;
   });
 
-  const updateTimesheetStatus = (id: string, status: string) => handleAsync(async () => {
-    // Timesheet functionality disabled
-    throw new Error('Timesheet functionality is not available');
+  // Helper function to generate monthly timesheet structure
+  const generateMonthlyTimesheets = () => {
+    const currentYear = new Date().getFullYear();
+    const timesheets: Record<string, { hours: number; status: string }> = {};
+    
+    for (let month = 1; month <= 12; month++) {
+      const monthKey = `${currentYear}-${String(month).padStart(2, '0')}`;
+      timesheets[monthKey] = {
+        hours: 0,
+        status: 'Not Started'
+      };
+    }
+    
+    return timesheets;
+  };
+
+  const updateTimesheetStatus = (applicantId: string, month: string, status: string) => handleAsync(async () => {
+    // Find the applicant and update their timesheet status
+    const applicantIndex = mockApplicants.findIndex(a => a.id === applicantId);
+    if (applicantIndex !== -1) {
+      const applicant = mockApplicants[applicantIndex];
+      if (!applicant.monthly_timesheets) {
+        applicant.monthly_timesheets = generateMonthlyTimesheets();
+      }
+      
+      if (applicant.monthly_timesheets[month]) {
+        applicant.monthly_timesheets[month].status = status;
+        
+        // Add to activities
+        mockActivities.unshift({
+          id: Date.now().toString(),
+          action: `Timesheet ${status.toLowerCase()}`,
+          entity_type: 'timesheet',
+          entity_id: applicantId,
+          details: { month, status, applicant_name: applicant.full_name },
+          created_at: new Date().toISOString()
+        });
+        
+        return true;
+      }
+    }
+    throw new Error('Timesheet not found');
+  });
+
+  const updateTimesheetHours = (applicantId: string, month: string, hours: number) => handleAsync(async () => {
+    // Find the applicant and update their timesheet hours
+    const applicantIndex = mockApplicants.findIndex(a => a.id === applicantId);
+    if (applicantIndex !== -1) {
+      const applicant = mockApplicants[applicantIndex];
+      if (!applicant.monthly_timesheets) {
+        applicant.monthly_timesheets = generateMonthlyTimesheets();
+      }
+      
+      if (applicant.monthly_timesheets[month]) {
+        applicant.monthly_timesheets[month].hours = hours;
+        applicant.monthly_timesheets[month].status = hours > 0 ? 'Pending' : 'Not Started';
+        
+        // Add to activities
+        mockActivities.unshift({
+          id: Date.now().toString(),
+          action: 'Timesheet hours updated',
+          entity_type: 'timesheet',
+          entity_id: applicantId,
+          details: { month, hours, applicant_name: applicant.full_name },
+          created_at: new Date().toISOString()
+        });
+        
+        return true;
+      }
+    }
+    throw new Error('Timesheet not found');
   });
 
   // Activities operations
@@ -348,6 +446,7 @@ export const useSupabase = () => {
     // Timesheets
     getTimesheets,
     updateTimesheetStatus,
+    updateTimesheetHours,
     // Activities
     getActivities,
     // Departments
