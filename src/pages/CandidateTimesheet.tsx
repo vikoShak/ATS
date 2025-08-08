@@ -63,8 +63,13 @@ const CandidateTimesheet: React.FC = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      // Simulate API call to save timesheet data
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Save all timesheet data
+      if (candidate?.id) {
+        const savePromises = Object.entries(timesheetData).map(([month, hours]) =>
+          updateTimesheetHours(candidate.id, month, hours)
+        );
+        await Promise.all(savePromises);
+      }
       
       // Show success message
       const alertDiv = document.createElement('div');
@@ -73,7 +78,9 @@ const CandidateTimesheet: React.FC = () => {
       document.body.appendChild(alertDiv);
       
       setTimeout(() => {
-        document.body.removeChild(alertDiv);
+        if (document.body.contains(alertDiv)) {
+          document.body.removeChild(alertDiv);
+        }
       }, 3000);
     } catch (error) {
       console.error('Error saving timesheet:', error);

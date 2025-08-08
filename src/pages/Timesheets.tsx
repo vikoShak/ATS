@@ -235,7 +235,15 @@ const Timesheets: React.FC = () => {
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span className="text-sm text-gray-600">Hours:</span>
-                        <span className="text-sm font-medium">{timesheet.hours}</span>
+                        <input
+                          type="number"
+                          min="0"
+                          max="744"
+                          step="0.5"
+                          value={timesheet.hours}
+                          onChange={(e) => handleUpdateTimesheetHours(candidate.id, month, parseFloat(e.target.value) || 0)}
+                          className="w-16 text-sm text-right border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        />
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm text-gray-600">Payable:</span>

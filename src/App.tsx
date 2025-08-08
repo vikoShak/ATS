@@ -93,12 +93,9 @@ function App() {
             path="/timesheets"
             element={
               <ProtectedRoute>
-                <div className="flex items-center justify-center min-h-screen">
-                  <div className="text-center">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Timesheets Module Disabled</h2>
-                    <p className="text-gray-600">This functionality is currently not available.</p>
-                  </div>
-                </div>
+                <Layout>
+                  <Timesheets />
+                </Layout>
               </ProtectedRoute>
             }
           />
@@ -106,12 +103,9 @@ function App() {
             path="/timesheets/candidate/:candidateId"
             element={
               <ProtectedRoute>
-                <div className="flex items-center justify-center min-h-screen">
-                  <div className="text-center">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Candidate Timesheet Module Disabled</h2>
-                    <p className="text-gray-600">This functionality is currently not available.</p>
-                  </div>
-                </div>
+                <Layout>
+                  <CandidateTimesheet />
+                </Layout>
               </ProtectedRoute>
             }
           />
